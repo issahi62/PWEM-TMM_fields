@@ -23,7 +23,7 @@ figure('Color', 'w', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 L  = 1;       % Lattice constant 
-NH = 9;       % Number of spatial harmonics %% always choose an odd number
+NH = 3;       % Number of spatial harmonics %% always choose an odd number
 N  = NH^2;    % Size of matrices
 
 
@@ -32,7 +32,7 @@ N  = NH^2;    % Size of matrices
 %% DS_BOARD && GRID DATA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 um   = 1e-6;     % microns 
-lam0 = 0.01;     % wavelength 
+lam0 = 0.02;     % wavelength 
 Lx   = 0.0175*L; % periodicity x 
 Ly   = 0.0150*L;  
 
@@ -50,15 +50,15 @@ urT  = 1.0;      % permeability of URT
 erT  = 9.0;      % dielectric of TRN
 
 LA   = 2.0;      % thickness 
-Ldim = [0.003 0.005, 0.005, 0.004]; % Thickness length; 
+Ldim = [0.003 0.005]; % Thickness length; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% UNIT CELLS 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-triangle       = 0;        % triangle unit cell 
+triangle       = 1;        % triangle unit cell 
 square         = 0;        % unit cell 
 ring_hollow    = 0;        %ring-hollow unit cell
-ring_resonator = 1;        %square-unit cell
+ring_resonator = 0;        %square-unit cell
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +70,7 @@ erd2 = 2.0;
  
 %Initialize Layers to device
 URA = urd * ones(Nx,Ny);
-ER1= erd * ones(Nx,Ny);
+ER1 = erd * ones(Nx,Ny);
 ERA = erd * ones(Nx,Ny);
 
 if (square ==1 && triangle == 1 && ring_hollow == 1  && ring_resonator == 1) | (square ==0 && triangle == 0 && ring_hollow == 0  && ring_resonator == 0)
@@ -88,7 +88,7 @@ end
 
 if triangle == 1
 %Build Device (Layer 1)
-w     = 0.8 * Lx;
+w     = 0.8 * Ly;
 h     = 0.5 * sqrt(3) * w;
 ny    = round(h/dy);
 ny1   = round((Ny-ny)/2);
@@ -152,13 +152,13 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ER(:, :, 1) = ERA; 
 ER(:, :, 2) = ER1; 
-ER(:, :, 3) = ERA; 
-ER(:, :, 4) = ER1;
+%ER(:, :, 3) = ERA; 
+%ER(:, :, 4) = ER1;
 
 UR(:, :, 1) = URA; 
 UR(:, :, 2) = URA; 
-UR(:, :, 3) = URA; 
-UR(:, :, 4) = URA; 
+%UR(:, :, 3) = URA; 
+%UR(:, :, 4) = URA; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BUILD CONVMAT_ MATRICES
@@ -207,9 +207,9 @@ src.esrc = [Esrcx .* esrcShape; Esrcy .* esrcShape];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  ninc = sqrt(erR * urR);
-  kinc.x = ninc * sin(src.theta)*cos(src.phi);
-  kinc.y = ninc * sin(src.theta)*sin(src.phi);
-  kinc.z = ninc * cos(src.theta);
+  kinc.x = ninc * k(1);
+  kinc.y = ninc * k(2);
+  kinc.z = ninc * k(3);
   k0 = 2*pi / lam0;
   
   %assume equal and odd number of spatial harmonics in x,y directions
@@ -264,6 +264,7 @@ LAM = W0;
 LAM(x1,y1) = (sqrt(-1)*Kz);
 LAM(x2,y2) = (sqrt(-1)*Kz);  
 V0 = Q0/(LAM);
+
 SG.S11 = zeros(2*N,2*N);
 SG.S21 = eye(2*N);
 SG.S12 = eye(2*N);
@@ -366,7 +367,7 @@ for layer = 1:length(Ldim)
   %Compute S-matrix temp variables
   A = (W)\ W0 + (V)\V0;
   B = (W)\ W0 - (V)\V0;
-  X = expm(-LAM * (2*pi /lam0) * Ldim(layer));
+  X = expm(-LAM * k0 * Ldim(layer));
   
   Si.S11 = (A - X*B/A*X*B)\(X*B/A*X*A - B);
   Si.S12 = (A - X*B/A*X*B)\X*(A - B/A*B);
