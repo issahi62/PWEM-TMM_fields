@@ -261,8 +261,8 @@ W0(x1,y1) = eye(N);
 W0(x2,y2) = eye(N);
 
 LAM = W0;
-LAM(x1,y1) = (sqrt(-1)*Kz);
-LAM(x2,y2) = (sqrt(-1)*Kz);  
+LAM(x1,y1) = (1i*Kz);
+LAM(x2,y2) = (1i*Kz);  
 V0 = Q0/(LAM);
 
 SG.S11 = zeros(2*N,2*N);
@@ -398,11 +398,11 @@ rx = eref(1:N);
 ry = eref(N+1:end);
 rz = -(KzR)\(Kx*rx + Ky*ry);
 R = abs(rx).^2 + abs(ry).^2 + abs(rz).^2;
-Gamma = rx + ry + rz;
+%Gamma = rx + ry + rz;
 kzInc = cos(src.theta)*sqrt(erR * urR);
 R = real(-KzR / kzInc) * R;
-Gamma = reshape(Gamma,[NH,NH]);
-REF = norm(sum(sum(R)));
+Gamma = reshape(R,[NH,NH]);
+REF = sum(Gamma(:));
 
 
 %***********************
@@ -412,11 +412,11 @@ etrn = Wtrn * SG.S21 * csrc;
 tx = etrn(1:N);
 ty = etrn(N+1:end);
 tz = -(KzT) \ (Kx*tx + Ky*ty);
-Tau = tx + ty + tz; 
+%Tau = tx + ty + tz; 
 T = abs(tx).^2 + abs(ty).^2 + abs(tz).^2;
 T = real((urR / urT) * KzT/kzInc) * T;
-Tau = reshape(Tau,[NH,NH]);
-TRN = norm(sum(sum(T)));
+Tau = reshape(T,[NH,NH]);
+TRN = sum(Tau(:));
 
 %CONSERVATION LAW; 
 
