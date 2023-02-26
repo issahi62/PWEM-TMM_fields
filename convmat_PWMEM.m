@@ -6,7 +6,7 @@ function C = convmat_PWMEM(A, P, Q, R)
 %
 % C = convmat_PWMEM(A, P); for 1D problems  
 % C = convmat_PWMEM(A, P, Q); for 2D problems 
-% C = convmat_PWMEM(A, P, Q R); for 3D problems 
+% C = convmat_PWMEM(A, P, Q, R); for 3D problems 
 
 % This function constructs convolution matrices 
 % real space grid. 
